@@ -34,6 +34,28 @@ class Doll {
   }
 }
 
+// global
+const startPosition = 3;
+const endPosition = -startPosition;
+
+function createCube(size, positionX, rotationY = 0, color = 0xfbc851) {
+  const geometry = new THREE.BoxGeometry(size.w, size.h, size.d);
+  const material = new THREE.MeshBasicMaterial({ color });
+  const cube = new THREE.Mesh(geometry, material);
+  cube.position.set(positionX, 0, 0);
+  cube.rotation.set(0, rotationY, 0);
+  scene.add(cube);
+  return cube;
+}
+
+function createTrack() {
+  createCube({ w: startPosition * 2 + .2, h: 1.5, d: 1 }, 0, 0, 0xe5a716).position.z = -1;
+  createCube({ w: .2, h: 1.5, d: 1}, startPosition, -.35);
+  createCube({ w: .2, h: 1.5, d: 1}, endPosition, .35);
+}
+
+createTrack();
+
 let doll = new Doll();
 setTimeout(() => {
   doll.lookBackward();
