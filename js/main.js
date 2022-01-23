@@ -26,11 +26,11 @@ class Doll {
   }
 
   lookBackward() {
-    this.doll.rotation.y = -3.15;
+    gsap.to(this.doll.rotation, { y: -3.15, duration: .45 });
   }
 
   lookForward() {
-    this.doll.rotation.y = 0;
+    gsap.to(this.doll.rotation, { y: 0, duration: .45 });
   }
 }
 
