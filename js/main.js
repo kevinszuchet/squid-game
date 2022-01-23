@@ -26,15 +26,18 @@ class Doll {
       gltf.scene.scale.set(.4, .4, .4);
       gltf.scene.position.set(0, -1, 0);
       this.doll = gltf.scene;
+      this.isLookingBackward = false;
     });
   }
 
   lookBackward() {
     gsap.to(this.doll.rotation, { y: -3.15, duration: .45 });
+    setTimeout(() => this.isLookingBackward = true, 150);
   }
 
   lookForward() {
     gsap.to(this.doll.rotation, { y: 0, duration: .45 });
+    setTimeout(() => this.isLookingBackward = false, 450);
   }
 
   async start() {
@@ -68,7 +71,20 @@ class Player {
     gsap.to(this.info, { velocity: 0, duration: .1 });
   }
 
+  check() {
+    if (this.info.velocity > 0 && player.isLookingBackward) {
+      text.innerText = "You lose!";
+      gameStatus = "over";
+    }
+
+    if (this.info.positionX < endPosition + .4) {
+      text.innerText = "You win!";
+      gameStatus = "over";
+    }
+  }
+
   update() {
+    this.check();
     this.info.positionX -= this.info.velocity;
     this.player.position.x = this.info.positionX;
   }
@@ -77,6 +93,9 @@ class Player {
 // global
 const startPosition = 3;
 const endPosition = -startPosition;
+const text = document.querySelector('.text');
+const TIME_LIMIT = 10;
+let gameStatus = "loading";
 
 function createCube(size, positionX, rotationY = 0, color = 0xfbc851) {
   const geometry = new THREE.BoxGeometry(size.w, size.h, size.d);
@@ -98,11 +117,36 @@ createTrack();
 
 let doll = new Doll();
 let player = new Player();
-setTimeout(() => {
+
+async function init() {
+  for (let i = 3; i >= 0; i--) {
+    await delay(1000);
+    if (i === 0) break;
+    text.innerText = `Starting in ${i}`;
+  }
+  text.innerText = "Happy Squid Games, and may the odds be ever in your favor (?";
+  startGame();
+}
+
+function startGame() {
+  gameStatus = "running";
+  let progressBar = createCube({ w: 5, h: .1, d: 1 }, 0);
+  progressBar.position.y = 3.35;
+  gsap.to(progressBar.scale, { x: 0, duration: TIME_LIMIT, ease: "none" });
   doll.start();
-}, 1000)
+  setTimeout(() => {
+    if (gameStatus !== "over") {
+      text.innerText = "You ran out of time!";
+      gameStatus = "over";
+    }
+
+  }, TIME_LIMIT * 1000);
+}
+
+init();
 
 function animate() {
+  if (gameStatus === "over") return;
   renderer.render(scene, camera);
   requestAnimationFrame(animate);
   player.update();
@@ -121,6 +165,7 @@ function onWindowResize() {
 const ARROW_UP = "ArrowUp";
 
 window.addEventListener("keydown", (e) => {
+  if (gameStatus !== "running") return;
   if (e.key == ARROW_UP)
     player.run();
 });
