@@ -34,6 +34,34 @@ class Doll {
   }
 }
 
+class Player {
+  constructor() {
+    const geometry = new THREE.SphereGeometry(.3, 32, 16);
+    const material = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    const sphere = new THREE.Mesh(geometry, material);
+    sphere.position.set(startPosition, 0, 1);
+    scene.add(sphere);
+    this.player = sphere;
+    this.info = {
+      positionX: startPosition,
+      velocity: 0
+    }
+  }
+
+  run() {
+    this.info.velocity = .03;
+  }
+
+  stop() {
+    gsap.to(this.info, { velocity: 0, duration: .1 });
+  }
+
+  update() {
+    this.info.positionX -= this.info.velocity;
+    this.player.position.x = this.info.positionX;
+  }
+}
+
 // global
 const startPosition = 3;
 const endPosition = -startPosition;
@@ -57,6 +85,7 @@ function createTrack() {
 createTrack();
 
 let doll = new Doll();
+let player = new Player();
 setTimeout(() => {
   doll.lookBackward();
 }, 1000)
@@ -64,6 +93,7 @@ setTimeout(() => {
 function animate() {
   renderer.render(scene, camera);
   requestAnimationFrame(animate);
+  player.update();
 } 
 
 animate();
@@ -75,3 +105,15 @@ function onWindowResize() {
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
 }
+
+const ARROW_UP = "ArrowUp";
+
+window.addEventListener("keydown", (e) => {
+  if (e.key == ARROW_UP)
+    player.run();
+});
+
+window.addEventListener("keyup", (e) => {
+  if (e.key == ARROW_UP)
+    player.stop();
+});
