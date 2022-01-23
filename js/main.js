@@ -26,18 +26,17 @@ class Doll {
       gltf.scene.scale.set(.4, .4, .4);
       gltf.scene.position.set(0, -1, 0);
       this.doll = gltf.scene;
-      this.isLookingBackward = false;
     });
   }
 
   lookBackward() {
     gsap.to(this.doll.rotation, { y: -3.15, duration: .45 });
-    setTimeout(() => this.isLookingBackward = true, 150);
+    setTimeout(() => isLookingBackward = true, 150);
   }
 
   lookForward() {
     gsap.to(this.doll.rotation, { y: 0, duration: .45 });
-    setTimeout(() => this.isLookingBackward = false, 450);
+    setTimeout(() => isLookingBackward = false, 450);
   }
 
   async start() {
@@ -72,7 +71,7 @@ class Player {
   }
 
   check() {
-    if (this.info.velocity > 0 && player.isLookingBackward) {
+    if (this.info.velocity > 0 && !isLookingBackward) {
       text.innerText = "You lose!";
       gameStatus = "over";
     }
@@ -95,7 +94,9 @@ const startPosition = 3;
 const endPosition = -startPosition;
 const text = document.querySelector('.text');
 const TIME_LIMIT = 10;
+
 let gameStatus = "loading";
+let isLookingBackward = true;
 
 function createCube(size, positionX, rotationY = 0, color = 0xfbc851) {
   const geometry = new THREE.BoxGeometry(size.w, size.h, size.d);
